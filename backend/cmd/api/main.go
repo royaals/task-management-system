@@ -8,6 +8,7 @@ import (
     "task-management/internal/handlers"
     "task-management/internal/middleware"
     "task-management/internal/database"
+    "task-management/internal/services"  // Add this import
 )
 
 func main() {
@@ -15,14 +16,20 @@ func main() {
         log.Fatal("Error loading .env file")
     }
 
+    // Initialize database
     database.InitDatabase()
 
+    // Start WebSocket hub
+    go services.WebsocketHub.Run()
+
+    // Initialize Gin router
     r := gin.Default()
     r.Use(middleware.CORSMiddleware())
 
+    // API routes
     api := r.Group("/api")
     {
-        // Auth routes
+        // Public routes
         api.POST("/register", handlers.Register)
         api.POST("/login", handlers.Login)
 
@@ -36,18 +43,23 @@ func main() {
             protected.PUT("/tasks/:id", handlers.UpdateTask)
             protected.DELETE("/tasks/:id", handlers.DeleteTask)
             
-                // AI suggestions routes
-    protected.GET("/tasks/:id/suggestions", handlers.GetAISuggestions)
-    protected.POST("/tasks/:id/suggestions", handlers.GetAISuggestions) // Generate new suggestions
+            // AI suggestions routes
+            protected.GET("/tasks/:id/suggestions", handlers.GetAISuggestions)
+            protected.POST("/tasks/:id/suggestions", handlers.GetAISuggestions)
             
             // WebSocket connection
             protected.GET("/ws", handlers.HandleWebSocket)
         }
     }
 
+    // Start server
     port := os.Getenv("PORT")
     if port == "" {
         port = "8080"
     }
-    r.Run(":" + port)
+
+    log.Printf("Server starting on port %s", port)
+    if err := r.Run(":" + port); err != nil {
+        log.Fatal("Error starting server: ", err)
+    }
 }

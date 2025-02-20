@@ -3,7 +3,9 @@ export interface User {
     email: string;
   }
   
-  export interface Task {
+
+// types/index.ts
+export interface Task {
     id: string;
     title: string;
     description: string;
@@ -14,8 +16,8 @@ export interface User {
     created_by: string;
     created_at: string;
     updated_at: string;
-  }
-  
+}
+
   export interface AIResponse {
     suggestions: string;
     generated_at: string;

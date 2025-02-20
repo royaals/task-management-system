@@ -2,7 +2,6 @@ package handlers
 
 import (
     "context"
-    "fmt"     // Add this import
     "log"
     "os"
     "time"
@@ -34,11 +33,9 @@ func CreateTask(c *gin.Context) {
         return
     }
 
-    // Generate AI suggestions
-    aiService, err := services.NewAIService(os.Getenv("OPENAI_API_KEY"))  // Fix: handle both return values
-    if err != nil {
-        log.Printf("Error creating AI service: %v", err)
-    } else {
+    // Generate AI suggestions if configured
+    aiService, err := services.NewAIService(os.Getenv("OPENAI_API_KEY"))
+    if err == nil {
         suggestions, err := aiService.GenerateTaskSuggestions(task)
         if err != nil {
             log.Printf("Error generating AI suggestions: %v", err)
@@ -54,9 +51,10 @@ func CreateTask(c *gin.Context) {
     }
 
     // Broadcast task creation to all connected clients
-    services.WsService.BroadcastUpdate(gin.H{
-        "type": "task_created",
+    services.BroadcastMessage("task_created", gin.H{
         "task": task,
+        "created_by": userID,
+        "timestamp": time.Now(),
     })
 
     c.JSON(201, task)
@@ -87,14 +85,36 @@ func UpdateTask(c *gin.Context) {
 
     if result.ModifiedCount > 0 {
         // Broadcast task update
-        services.WsService.BroadcastUpdate(gin.H{  // Changed from wsService to services.WsService
-            "type": "task_updated",
+        services.BroadcastMessage("task_updated", gin.H{
             "task_id": taskID,
             "updates": updateData,
+            "timestamp": time.Now(),
         })
     }
 
     c.JSON(200, gin.H{"message": "Task updated successfully"})
+}
+
+func DeleteTask(c *gin.Context) {
+    taskID, _ := primitive.ObjectIDFromHex(c.Param("id"))
+
+    collection := database.Client.Database("taskmanagement").Collection("tasks")
+    result, err := collection.DeleteOne(context.Background(), bson.M{"_id": taskID})
+
+    if err != nil {
+        c.JSON(500, gin.H{"error": "Failed to delete task"})
+        return
+    }
+
+    if result.DeletedCount > 0 {
+        // Broadcast task deletion
+        services.BroadcastMessage("task_deleted", gin.H{
+            "task_id": taskID,
+            "timestamp": time.Now(),
+        })
+    }
+
+    c.JSON(200, gin.H{"message": "Task deleted successfully"})
 }
 
 func GetTasks(c *gin.Context) {
@@ -116,24 +136,6 @@ func GetTasks(c *gin.Context) {
     c.JSON(200, tasks)
 }
 
-func DeleteTask(c *gin.Context) {
-    taskID, _ := primitive.ObjectIDFromHex(c.Param("id"))
-
-    collection := database.Client.Database("taskmanagement").Collection("tasks")
-    _, err := collection.DeleteOne(context.Background(), bson.M{"_id": taskID})
-    if err != nil {
-        c.JSON(500, gin.H{"error": "Failed to delete task"})
-        return
-    }
-
-    // Broadcast task deletion
-    services.WsService.BroadcastUpdate(gin.H{
-        "type": "task_deleted",
-        "task_id": taskID,
-    })
-
-    c.JSON(200, gin.H{"message": "Task deleted successfully"})
-}
 func GetAISuggestions(c *gin.Context) {
     taskID, err := primitive.ObjectIDFromHex(c.Param("id"))
     if err != nil {
@@ -146,31 +148,20 @@ func GetAISuggestions(c *gin.Context) {
     var task models.Task
     err = collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
     if err != nil {
-        log.Printf("Error finding task: %v", err)
         c.JSON(404, gin.H{"error": "Task not found"})
         return
     }
 
-    // Check if OpenAI API key is set
-    apiKey := os.Getenv("OPENAI_API_KEY")
-    if apiKey == "" {
-        log.Printf("OpenAI API key not set")
-        c.JSON(500, gin.H{"error": "OpenAI API key not configured"})
-        return
-    }
-
-    // Generate new AI suggestions
-    aiService, err := services.NewAIService(apiKey)
+    // Generate AI suggestions
+    aiService, err := services.NewAIService(os.Getenv("OPENAI_API_KEY"))
     if err != nil {
-        log.Printf("Error creating AI service: %v", err)
-        c.JSON(500, gin.H{"error": fmt.Sprintf("Failed to initialize AI service: %v", err)})
+        c.JSON(500, gin.H{"error": "Failed to initialize AI service"})
         return
     }
 
     suggestions, err := aiService.GenerateTaskSuggestions(task)
     if err != nil {
-        log.Printf("Error generating suggestions: %v", err)
-        c.JSON(500, gin.H{"error": fmt.Sprintf("Failed to generate suggestions: %v", err)})
+        c.JSON(500, gin.H{"error": "Failed to generate suggestions"})
         return
     }
 
@@ -185,12 +176,7 @@ func GetAISuggestions(c *gin.Context) {
     _, err = suggCollection.InsertOne(context.Background(), suggestion)
     if err != nil {
         log.Printf("Error storing AI suggestions: %v", err)
-        // Continue anyway since we have the suggestions
     }
 
-    c.JSON(200, gin.H{
-        "task_id": taskID,
-        "suggestions": suggestions,
-        "generated_at": suggestion.GeneratedAt,
-    })
+    c.JSON(200, suggestion)
 }
