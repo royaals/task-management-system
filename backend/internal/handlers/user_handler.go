@@ -3,15 +3,15 @@ package handlers
 import (
     "context"
     "github.com/gin-gonic/gin"
+    "github.com/golang-jwt/jwt/v4"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/mongo"
     "golang.org/x/crypto/bcrypt"
     "task-management/internal/models"
+    "task-management/internal/database"  // Add this import
     "os"
     "time"
 )
-
-var client *mongo.Client
 
 func Register(c *gin.Context) {
     var user models.User
@@ -29,7 +29,7 @@ func Register(c *gin.Context) {
     user.Password = string(hashedPassword)
 
     // Insert user into database
-    collection := client.Database("taskmanagement").Collection("users")
+    collection := database.Client.Database("taskmanagement").Collection("users")
     result, err := collection.InsertOne(context.Background(), user)
     if err != nil {
         c.JSON(500, gin.H{"error": "Failed to create user"})
@@ -52,7 +52,7 @@ func Login(c *gin.Context) {
 
     // Find user
     var user models.User
-    collection := client.Database("taskmanagement").Collection("users")
+    collection := database.Client.Database("taskmanagement").Collection("users")
     err := collection.FindOne(context.Background(), bson.M{"email": loginData.Email}).Decode(&user)
     if err != nil {
         c.JSON(401, gin.H{"error": "Invalid credentials"})
