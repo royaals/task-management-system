@@ -1,6 +1,7 @@
 package services
 
 import (
+    "net/http"
     "sync"
     "github.com/gorilla/websocket"
     "log"
@@ -12,17 +13,19 @@ type WebSocketService struct {
 }
 
 var (
-    wsUpgrader = websocket.Upgrader{
+    WsUpgrader = websocket.Upgrader{
         ReadBufferSize:  1024,
         WriteBufferSize: 1024,
         CheckOrigin: func(r *http.Request) bool {
             return true // In production, implement proper origin checking
         },
     }
-    wsService = &WebSocketService{
+    // Global instance
+    WsService = &WebSocketService{
         clients: make(map[string]*websocket.Conn),
     }
 )
+
 
 func (ws *WebSocketService) AddClient(userID string, conn *websocket.Conn) {
     ws.clientsMux.Lock()

@@ -7,28 +7,22 @@ import (
     "github.com/joho/godotenv"
     "task-management/internal/handlers"
     "task-management/internal/middleware"
-    "task-management/internal/database"  // Add this import
+    "task-management/internal/database"
 )
 
 func main() {
-    // Load .env file
     if err := godotenv.Load(); err != nil {
         log.Fatal("Error loading .env file")
     }
 
-    // Initialize database
     database.InitDatabase()
 
-    // Initialize router
     r := gin.Default()
-
-    // Add CORS middleware
     r.Use(middleware.CORSMiddleware())
 
-    // Routes
     api := r.Group("/api")
     {
-        // Public routes
+        // Auth routes
         api.POST("/register", handlers.Register)
         api.POST("/login", handlers.Login)
 
@@ -41,10 +35,16 @@ func main() {
             protected.POST("/tasks", handlers.CreateTask)
             protected.PUT("/tasks/:id", handlers.UpdateTask)
             protected.DELETE("/tasks/:id", handlers.DeleteTask)
+            
+                // AI suggestions routes
+    protected.GET("/tasks/:id/suggestions", handlers.GetAISuggestions)
+    protected.POST("/tasks/:id/suggestions", handlers.GetAISuggestions) // Generate new suggestions
+            
+            // WebSocket connection
+            protected.GET("/ws", handlers.HandleWebSocket)
         }
     }
 
-    // Start server
     port := os.Getenv("PORT")
     if port == "" {
         port = "8080"
