@@ -1,14 +1,14 @@
 package models
 
 import (
-    "time"
     "go.mongodb.org/mongo-driver/bson/primitive"
+    "time"
 )
 
 type User struct {
     ID       primitive.ObjectID `bson:"_id,omitempty" json:"id"`
     Email    string            `bson:"email" json:"email"`
-    Password string            `bson:"password" json:"-"`
+    Password string            `bson:"password" json:"password,omitempty"`
 }
 
 type Task struct {

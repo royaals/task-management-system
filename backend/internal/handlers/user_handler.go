@@ -2,80 +2,121 @@ package handlers
 
 import (
     "context"
+    "log"
+    "os"
+    "time"
     "github.com/gin-gonic/gin"
     "github.com/golang-jwt/jwt/v4"
     "go.mongodb.org/mongo-driver/bson"
-    "go.mongodb.org/mongo-driver/mongo"
+    "go.mongodb.org/mongo-driver/bson/primitive"
     "golang.org/x/crypto/bcrypt"
     "task-management/internal/models"
-    "task-management/internal/database"  // Add this import
-    "os"
-    "time"
+    "task-management/internal/database"
 )
 
 func Register(c *gin.Context) {
-    var user models.User
-    if err := c.ShouldBindJSON(&user); err != nil {
-        c.JSON(400, gin.H{"error": err.Error()})
-        return
-    }
-
-    // Hash password
-    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-    if err != nil {
-        c.JSON(500, gin.H{"error": "Failed to hash password"})
-        return
-    }
-    user.Password = string(hashedPassword)
-
-    // Insert user into database
-    collection := database.Client.Database("taskmanagement").Collection("users")
-    result, err := collection.InsertOne(context.Background(), user)
-    if err != nil {
-        c.JSON(500, gin.H{"error": "Failed to create user"})
-        return
-    }
-
-    c.JSON(201, gin.H{"id": result.InsertedID})
-}
-
-func Login(c *gin.Context) {
-    var loginData struct {
+    var input struct {
         Email    string `json:"email"`
         Password string `json:"password"`
     }
 
-    if err := c.ShouldBindJSON(&loginData); err != nil {
+    if err := c.ShouldBindJSON(&input); err != nil {
         c.JSON(400, gin.H{"error": err.Error()})
         return
     }
 
+    // Log the received data
+    log.Printf("Registering user with email: %s", input.Email)
+    log.Printf("Original password: %s", input.Password)
+
+    // Generate password hash
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
+    if err != nil {
+        log.Printf("Error hashing password: %v", err)
+        c.JSON(500, gin.H{"error": "Failed to hash password"})
+        return
+    }
+
+    log.Printf("Hashed password: %s", string(hashedPassword))
+
+    // Create user
+    user := models.User{
+        ID:       primitive.NewObjectID(),
+        Email:    input.Email,
+        Password: string(hashedPassword),
+    }
+
+    // Save to database
+    collection := database.Client.Database("taskmanagement").Collection("users")
+    _, err = collection.InsertOne(context.Background(), user)
+    if err != nil {
+        log.Printf("Error saving user: %v", err)
+        c.JSON(500, gin.H{"error": "Failed to create user"})
+        return
+    }
+
+    log.Printf("User registered successfully with ID: %s", user.ID.Hex())
+
+    c.JSON(201, gin.H{
+        "id": user.ID.Hex(),
+        "email": user.Email,
+    })
+}
+
+func Login(c *gin.Context) {
+    var input struct {
+        Email    string `json:"email"`
+        Password string `json:"password"`
+    }
+
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(400, gin.H{"error": err.Error()})
+        return
+    }
+
+  
+
     // Find user
     var user models.User
     collection := database.Client.Database("taskmanagement").Collection("users")
-    err := collection.FindOne(context.Background(), bson.M{"email": loginData.Email}).Decode(&user)
+    err := collection.FindOne(context.Background(), bson.M{"email": input.Email}).Decode(&user)
     if err != nil {
+        log.Printf("User not found: %v", err)
         c.JSON(401, gin.H{"error": "Invalid credentials"})
         return
     }
 
-    // Check password
-    if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password)); err != nil {
+  
+
+    // Compare passwords
+    err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
+    if err != nil {
+        log.Printf("Password comparison failed: %v", err)
         c.JSON(401, gin.H{"error": "Invalid credentials"})
         return
     }
 
     // Generate token
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-        "user_id": user.ID,
+        "user_id": user.ID.Hex(),
+        "email":   user.Email,
         "exp":     time.Now().Add(time.Hour * 24).Unix(),
     })
 
     tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
     if err != nil {
+        log.Printf("Error generating token: %v", err)
         c.JSON(500, gin.H{"error": "Failed to generate token"})
         return
     }
 
-    c.JSON(200, gin.H{"token": tokenString})
+    
+
+    c.JSON(200, gin.H{
+        "token": tokenString,
+        "user": gin.H{
+            "id":    user.ID.Hex(),
+            "email": user.Email,
+        },
+    })
 }

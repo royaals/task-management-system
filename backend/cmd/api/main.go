@@ -7,6 +7,7 @@ import (
     "github.com/joho/godotenv"
     "task-management/internal/handlers"
     "task-management/internal/middleware"
+    "task-management/internal/database"  // Add this import
 )
 
 func main() {
@@ -14,6 +15,9 @@ func main() {
     if err := godotenv.Load(); err != nil {
         log.Fatal("Error loading .env file")
     }
+
+    // Initialize database
+    database.InitDatabase()
 
     // Initialize router
     r := gin.Default()
