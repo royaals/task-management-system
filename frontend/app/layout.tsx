@@ -5,6 +5,10 @@ import { AuthProvider } from '@/contexts/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
+export const metadata = {
+  title: "TaskAI - AI-Powered Task Management",
+  description: "Streamline your workflow with intelligent task management powered by AI",
+}
 export default function RootLayout({
   children,
 }: {
