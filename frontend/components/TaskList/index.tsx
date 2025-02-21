@@ -2,8 +2,16 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+
 import { Task } from '@/types';
-import { TaskListProps } from './types';
+
+interface TaskListProps {
+    tasks: Task[];
+    onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
+    onDeleteTask: (taskId: string) => Promise<void>;
+}
+
+
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask }) => {
     return (

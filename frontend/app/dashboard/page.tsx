@@ -1,4 +1,4 @@
-//@ts-nocheck
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -20,6 +20,9 @@ import {
     ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '@/components/LoadingSpinner';
+
+
+
 
 interface Statistics {
     total: number;
@@ -269,11 +272,11 @@ export default function Dashboard() {
                 {/* Create Task Modal */}
                 <AnimatePresence>
                     {isCreateModalOpen && (
-                        <CreateTaskModal
-                            isOpen={isCreateModalOpen}
-                            onClose={() => setIsCreateModalOpen(false)}
-                            onCreateTask={handleCreateTask}
-                        />
+                      <CreateTaskModal
+                      isOpen={isCreateModalOpen}
+                      onClose={() => setIsCreateModalOpen(false)}
+                      onCreateTask={handleCreateTask}
+                  />
                     )}
                 </AnimatePresence>
             </main>
