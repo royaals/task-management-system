@@ -254,10 +254,10 @@ export default function Dashboard() {
                             </div>
                         ) : (
                             <TaskList
-                                tasks={filteredTasks}
-                                onUpdateTask={handleUpdateTask}
-                                onDeleteTask={handleDeleteTask}
-                            />
+    tasks={filteredTasks}
+    onUpdateTask={handleUpdateTask}
+    onDeleteTask={handleDeleteTask}
+/>
                         )}
                     </div>
                 </motion.div>

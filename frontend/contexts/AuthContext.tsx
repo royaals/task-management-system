@@ -22,7 +22,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
             const token = localStorage.getItem('token');
             if (token) {
-                const response = await axios.get(`${API_URL}/me`);
+                const response = await axios.get(`${API_URL}/api/me`);
                 setUser(response.data.user);
                 router.push('/dashboard');
             }
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const register = async (name: string, email: string, password: string) => {
         try {
-            const response = await axios.post(`${API_URL}/register`, {
+            const response = await axios.post(`${API_URL}/api/register`, {
                 name,
                 email,
                 password
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await axios.post(`${API_URL}/login`, {
+            const response = await axios.post(`${API_URL}/api/login`, {
                 email,
                 password
             });
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = async () => {
         try {
-            await axios.post(`${API_URL}/logout`);
+            await axios.post(`${API_URL}/api/logout`);
             toast.success('Logged out successfully');
         } catch (error) {
             console.error('Logout error:', error);
