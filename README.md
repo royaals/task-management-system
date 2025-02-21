@@ -1,50 +1,73 @@
-# Task Management System
+# TaskAI - AI-Powered Task Management System
 
-## Overview
-A robust task management system built with Spring Boot that allows users to create, manage, and track tasks efficiently.
 
-## Features
-- User authentication and authorization
-- Task creation and management
-- Task status tracking
-- Task assignment and delegation
-- Task categorization and priority levels
-- Search and filter functionality
-- RESTful API endpoints
+## 📋 Description
 
-## Technologies
-- Spring Boot
-- Spring Security
-- Spring Data JPA
-- PostgreSQL
-- Maven
-- JWT Authentication
-- Swagger/OpenAPI Documentation
+TaskAI is a modern, AI-powered task management system that combines intelligent task organization with real-time collaboration features. Built with cutting-edge technologies, it helps teams and individuals manage tasks more efficiently through AI-driven suggestions, real-time updates, and smart task breakdowns.
 
-## Getting Started
-1. Clone the repository
+## ✨ Features
+
+### Core Features
+- 🔐 Secure JWT-based authentication
+- ✅ Intuitive task creation and management
+- 🤖 AI-powered task suggestions and breakdowns
+- 🔄 Real-time updates via WebSocket
+- 👥 Team collaboration and task assignment
+- 📊 Analytics and progress tracking
+
+
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Language:** Go (Golang)
+- **Framework:** Gin
+- **Database:** MongoDB
+- **Authentication:** JWT
+- **Real-time:** WebSocket
+- **AI Integration:** OpenAI API
+
+### Frontend
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Real-time:** WebSocket
+- **UI Components:** Shadcn UI
+
+### DevOps
+- **Containerization:** Docker
+- **Orchestration:** Kubernetes
+- **CI/CD:** GitHub Actions
+- **Deployment:** 
+  - Frontend: Vercel
+  - Backend: Render
+
+## 📦 Installation
+
+### Prerequisites
+- Go 1.21+
+- Node.js 18+
+- MongoDB
+- Docker (optional)
+- OpenAI API Key
+
+### Local Development Setup
+
+1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/task-management-system.git
+git clone https://github.com/royaals/task-system.git
+cd task-system
 ```
-
-2. Configure database settings in `application.properties`
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/taskdb
-spring.datasource.username=your_username
-spring.datasource.password=your_password
-```
-
-3. Build and run the application
+2. backend
 ```bash
-mvn clean install
-mvn spring-boot:run
+cd backend
+replace the .env.example to .env
+go mod tidy
+go run cmd/api/main.go
 ```
-
-## API Documentation
-Access the API documentation at `http://localhost:8080/swagger-ui.html`
-
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first.
-
-## License
-[MIT License](LICENSE)
+3. frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
