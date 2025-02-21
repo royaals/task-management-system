@@ -1,9 +1,9 @@
-import Layout from '@/components/Layout';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function DashboardLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  return <Layout>{children}</Layout>;
+    return <ProtectedRoute>{children}</ProtectedRoute>;
 }

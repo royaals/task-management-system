@@ -3,8 +3,8 @@ package middleware
 import (
     "github.com/gin-gonic/gin"
     "github.com/golang-jwt/jwt/v4"
-    "os"
     "strings"
+    "os"
 )
 
 func CORSMiddleware() gin.HandlerFunc {

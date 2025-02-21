@@ -7,20 +7,20 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>
-        <ErrorBoundary>
-          <AuthProvider>
-            {children}
-            <Toaster position="bottom-right" />
-          </AuthProvider>
-        </ErrorBoundary>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <body className={inter.className}>
+                <ErrorBoundary>
+                    <AuthProvider>
+                        {children}
+                        <Toaster position="bottom-right" />
+                    </AuthProvider>
+                </ErrorBoundary>
+            </body>
+        </html>
+    );
 }

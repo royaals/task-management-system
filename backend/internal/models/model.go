@@ -9,7 +9,6 @@ type User struct {
     ID       primitive.ObjectID `bson:"_id,omitempty" json:"id"`
     Email    string            `bson:"email" json:"email"`
     Password string            `bson:"password" json:"-"`
-    Name     string            `bson:"name" json:"name"`
 }
 
 type Task struct {
@@ -18,21 +17,12 @@ type Task struct {
     Description string            `bson:"description" json:"description"`
     Status      string            `bson:"status" json:"status"`
     Priority    string            `bson:"priority" json:"priority"`
-    DueDate     time.Time         `bson:"due_date" json:"due_date"`
-    AssignedTo  primitive.ObjectID `bson:"assigned_to" json:"assigned_to"`
+    DueDate     *time.Time        `bson:"due_date,omitempty" json:"due_date,omitempty"`
+    AssignedTo  primitive.ObjectID `bson:"assigned_to,omitempty" json:"assigned_to,omitempty"`
     CreatedBy   primitive.ObjectID `bson:"created_by" json:"created_by"`
     CreatedAt   time.Time         `bson:"created_at" json:"created_at"`
     UpdatedAt   time.Time         `bson:"updated_at" json:"updated_at"`
-    Tags        []string          `bson:"tags" json:"tags"`
-}
-
-type Notification struct {
-    ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-    UserID    primitive.ObjectID `bson:"user_id" json:"user_id"`
-    Message   string            `bson:"message" json:"message"`
-    Type      string            `bson:"type" json:"type"`
-    Read      bool              `bson:"read" json:"read"`
-    CreatedAt time.Time         `bson:"created_at" json:"created_at"`
+    Tags        []string          `bson:"tags,omitempty" json:"tags,omitempty"`
 }
 
 type AITaskSuggestion struct {

@@ -8,7 +8,6 @@ import (
     "task-management/internal/handlers"
     "task-management/internal/middleware"
     "task-management/internal/database"
-    "task-management/internal/services"  // Add this import
 )
 
 func main() {
@@ -19,9 +18,6 @@ func main() {
     // Initialize database
     database.InitDatabase()
 
-    // Start WebSocket hub
-    go services.WebsocketHub.Run()
-
     // Initialize Gin router
     r := gin.Default()
     r.Use(middleware.CORSMiddleware())
@@ -29,7 +25,7 @@ func main() {
     // API routes
     api := r.Group("/api")
     {
-        // Public routes
+        // Auth routes
         api.POST("/register", handlers.Register)
         api.POST("/login", handlers.Login)
 
@@ -45,10 +41,6 @@ func main() {
             
             // AI suggestions routes
             protected.GET("/tasks/:id/suggestions", handlers.GetAISuggestions)
-            protected.POST("/tasks/:id/suggestions", handlers.GetAISuggestions)
-            
-            // WebSocket connection
-            protected.GET("/ws", handlers.HandleWebSocket)
         }
     }
 

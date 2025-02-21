@@ -2,48 +2,82 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useWebSocket } from '@/hooks/useWebSocket';
 import { taskApi } from '@/services/api';
 import TaskList from '@/components/TaskList';
 import Sidebar from '@/components/SideBar';
 import AIChat from '@/components/AIChat';
 import CreateTaskModal from '@/components/CreateTaskModal';
 import { Task } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import {
     ChartBarIcon,
     ClockIcon,
     CheckCircleIcon,
-    ExclamationCircleIcon,
     PlusIcon,
     ChartPieIcon,
+    ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
+interface Statistics {
+    total: number;
+    completed: number;
+    inProgress: number;
+    todo: number;
+}
+
+const initialStatistics: Statistics = {
+    total: 0,
+    completed: 0,
+    inProgress: 0,
+    todo: 0,
+};
+
+const StatCard = ({ title, value, icon: Icon, color }: {
+    title: string;
+    value: number;
+    icon: any;
+    color: string;
+}) => (
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+    >
+        <div className="flex items-center justify-between">
+            <div>
+                <p className="text-sm text-gray-600">{title}</p>
+                <p className="text-2xl font-semibold mt-2">{value}</p>
+            </div>
+            <div className={`p-3 rounded-full ${color}`}>
+                <Icon className="h-6 w-6 text-white" />
+            </div>
+        </div>
+    </motion.div>
+);
+
 export default function Dashboard() {
+    const { user, isLoading: isAuthLoading } = useAuth();
     const [tasks, setTasks] = useState<Task[]>([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedFilter, setSelectedFilter] = useState('all');
-    const [statistics, setStatistics] = useState({
-        total: 0,
-        completed: 0,
-        inProgress: 0,
-        todo: 0,
-    });
+    const [statistics, setStatistics] = useState<Statistics>(initialStatistics);
 
-    const { isConnected, sendMessage } = useWebSocket((data) => {
-        if (data.type === 'task_created' || data.type === 'task_updated' || data.type === 'task_deleted') {
+    // Fetch tasks when authenticated
+    useEffect(() => {
+        if (!isAuthLoading && user) {
             fetchTasks();
+            const interval = setInterval(fetchTasks, 30000);
+            return () => clearInterval(interval);
         }
-    });
+    }, [isAuthLoading, user]);
 
+    // Calculate statistics when tasks change
     useEffect(() => {
-        fetchTasks();
-    }, []);
-
-    useEffect(() => {
-        // Calculate statistics whenever tasks change
+        if (!tasks) return;
+        
         const stats = tasks.reduce(
             (acc, task) => {
                 acc.total++;
@@ -60,7 +94,7 @@ export default function Dashboard() {
                 }
                 return acc;
             },
-            { total: 0, completed: 0, inProgress: 0, todo: 0 }
+            { ...initialStatistics }
         );
         setStatistics(stats);
     }, [tasks]);
@@ -69,57 +103,71 @@ export default function Dashboard() {
         try {
             setIsLoading(true);
             const fetchedTasks = await taskApi.getTasks();
-            setTasks(fetchedTasks);
+            setTasks(fetchedTasks || []);
         } catch (error) {
-            toast.error('Failed to fetch tasks');
             console.error('Error fetching tasks:', error);
+            toast.error('Failed to fetch tasks');
+            setTasks([]);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const filteredTasks = tasks.filter(task => {
+    const handleCreateTask = async (taskData: Partial<Task>) => {
+        try {
+            await taskApi.createTask(taskData);
+            await fetchTasks();
+            setIsCreateModalOpen(false);
+            toast.success('Task created successfully');
+        } catch (error) {
+            console.error('Error creating task:', error);
+            toast.error('Failed to create task');
+        }
+    };
+
+    const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
+        try {
+            await taskApi.updateTask(taskId, updates);
+            await fetchTasks();
+            toast.success('Task updated successfully');
+        } catch (error) {
+            console.error('Error updating task:', error);
+            toast.error('Failed to update task');
+        }
+    };
+
+    const handleDeleteTask = async (taskId: string) => {
+        try {
+            await taskApi.deleteTask(taskId);
+            await fetchTasks();
+            toast.success('Task deleted successfully');
+        } catch (error) {
+            console.error('Error deleting task:', error);
+            toast.error('Failed to delete task');
+        }
+    };
+
+    const filteredTasks = tasks?.filter(task => {
         if (selectedFilter === 'all') return true;
         return task.status === selectedFilter;
-    });
+    }) || [];
 
-    const StatCard = ({ title, value, icon: Icon, color }: any) => (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
-        >
-            <div className="flex items-center justify-between">
-                <div>
-                    <p className="text-sm text-gray-600">{title}</p>
-                    <p className="text-2xl font-semibold mt-2">{value}</p>
-                </div>
-                <div className={`p-3 rounded-full ${color}`}>
-                    <Icon className="h-6 w-6 text-white" />
-                </div>
+    if (isAuthLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <LoadingSpinner size="large" />
             </div>
-        </motion.div>
-    );
+        );
+    }
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <div className="flex h-screen bg-gray-50">
             <Sidebar />
             <main className="flex-1 overflow-y-auto p-8">
-                {!isConnected && (
-                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                        <div className="flex">
-                            <div className="flex-shrink-0">
-                                <ExclamationCircleIcon className="h-5 w-5 text-yellow-400" />
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm text-yellow-700">
-                                    Connection to server lost. Attempting to reconnect...
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -129,7 +177,7 @@ export default function Dashboard() {
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900">Task Dashboard</h1>
                             <p className="text-gray-600 mt-1">
-                                Manage and track your tasks efficiently
+                                Welcome back, {user.email}
                             </p>
                         </div>
                         <button
@@ -204,7 +252,11 @@ export default function Dashboard() {
                                 </p>
                             </div>
                         ) : (
-                            <TaskList tasks={filteredTasks} onTaskUpdate={fetchTasks} />
+                            <TaskList
+                                tasks={filteredTasks}
+                                onUpdateTask={handleUpdateTask}
+                                onDeleteTask={handleDeleteTask}
+                            />
                         )}
                     </div>
                 </motion.div>
@@ -218,7 +270,7 @@ export default function Dashboard() {
                         <CreateTaskModal
                             isOpen={isCreateModalOpen}
                             onClose={() => setIsCreateModalOpen(false)}
-                            onTaskCreated={fetchTasks}
+                            onCreateTask={handleCreateTask}
                         />
                     )}
                 </AnimatePresence>

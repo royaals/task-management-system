@@ -50,14 +50,32 @@ func CreateTask(c *gin.Context) {
         }
     }
 
-    // Broadcast task creation to all connected clients
-    services.BroadcastMessage("task_created", gin.H{
-        "task": task,
-        "created_by": userID,
-        "timestamp": time.Now(),
-    })
-
     c.JSON(201, task)
+}
+
+func GetTasks(c *gin.Context) {
+    userID, _ := primitive.ObjectIDFromHex(c.GetString("user_id"))
+    
+    collection := database.Client.Database("taskmanagement").Collection("tasks")
+    cursor, err := collection.Find(context.Background(), bson.M{
+        "$or": []bson.M{
+            {"created_by": userID},
+            {"assigned_to": userID},
+        },
+    })
+    
+    if err != nil {
+        c.JSON(500, gin.H{"error": "Failed to fetch tasks"})
+        return
+    }
+
+    var tasks []models.Task
+    if err = cursor.All(context.Background(), &tasks); err != nil {
+        c.JSON(500, gin.H{"error": "Failed to decode tasks"})
+        return
+    }
+
+    c.JSON(200, tasks)
 }
 
 func UpdateTask(c *gin.Context) {
@@ -83,13 +101,9 @@ func UpdateTask(c *gin.Context) {
         return
     }
 
-    if result.ModifiedCount > 0 {
-        // Broadcast task update
-        services.BroadcastMessage("task_updated", gin.H{
-            "task_id": taskID,
-            "updates": updateData,
-            "timestamp": time.Now(),
-        })
+    if result.ModifiedCount == 0 {
+        c.JSON(404, gin.H{"error": "Task not found"})
+        return
     }
 
     c.JSON(200, gin.H{"message": "Task updated successfully"})
@@ -97,43 +111,25 @@ func UpdateTask(c *gin.Context) {
 
 func DeleteTask(c *gin.Context) {
     taskID, _ := primitive.ObjectIDFromHex(c.Param("id"))
+    userID, _ := primitive.ObjectIDFromHex(c.GetString("user_id"))
 
     collection := database.Client.Database("taskmanagement").Collection("tasks")
-    result, err := collection.DeleteOne(context.Background(), bson.M{"_id": taskID})
+    result, err := collection.DeleteOne(context.Background(), bson.M{
+        "_id": taskID,
+        "created_by": userID,
+    })
 
     if err != nil {
         c.JSON(500, gin.H{"error": "Failed to delete task"})
         return
     }
 
-    if result.DeletedCount > 0 {
-        // Broadcast task deletion
-        services.BroadcastMessage("task_deleted", gin.H{
-            "task_id": taskID,
-            "timestamp": time.Now(),
-        })
+    if result.DeletedCount == 0 {
+        c.JSON(404, gin.H{"error": "Task not found or unauthorized"})
+        return
     }
 
     c.JSON(200, gin.H{"message": "Task deleted successfully"})
-}
-
-func GetTasks(c *gin.Context) {
-    userID, _ := primitive.ObjectIDFromHex(c.GetString("user_id"))
-    
-    collection := database.Client.Database("taskmanagement").Collection("tasks")
-    cursor, err := collection.Find(context.Background(), bson.M{"assigned_to": userID})
-    if err != nil {
-        c.JSON(500, gin.H{"error": "Failed to fetch tasks"})
-        return
-    }
-
-    var tasks []models.Task
-    if err = cursor.All(context.Background(), &tasks); err != nil {
-        c.JSON(500, gin.H{"error": "Failed to decode tasks"})
-        return
-    }
-
-    c.JSON(200, tasks)
 }
 
 func GetAISuggestions(c *gin.Context) {
