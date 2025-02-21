@@ -1,3 +1,4 @@
+// cmd/api/main.go
 package main
 
 import (
@@ -20,6 +21,8 @@ func main() {
 
     // Initialize Gin router
     r := gin.Default()
+    
+    // Apply CORS middleware
     r.Use(middleware.CORSMiddleware())
 
     // API routes
@@ -28,20 +31,17 @@ func main() {
         // Auth routes
         api.POST("/register", handlers.Register)
         api.POST("/login", handlers.Login)
+        api.POST("/logout", handlers.Logout)
+        api.GET("/me", handlers.GetMe)
 
-        // Protected routes
-        protected := api.Group("/")
-        protected.Use(middleware.AuthMiddleware())
-        {
-            // Task routes
-            protected.GET("/tasks", handlers.GetTasks)
-            protected.POST("/tasks", handlers.CreateTask)
-            protected.PUT("/tasks/:id", handlers.UpdateTask)
-            protected.DELETE("/tasks/:id", handlers.DeleteTask)
-            
-            // AI routes
-            protected.POST("/ai/suggestions", handlers.GetAISuggestions)
-        }
+        // Task routes
+        api.GET("/tasks", handlers.GetTasks)
+        api.POST("/tasks", handlers.CreateTask)
+        api.PUT("/tasks/:id", handlers.UpdateTask)
+        api.DELETE("/tasks/:id", handlers.DeleteTask)
+        
+        // AI routes
+        api.POST("/ai/suggestions", handlers.GetAISuggestions)
     }
 
     // Start server

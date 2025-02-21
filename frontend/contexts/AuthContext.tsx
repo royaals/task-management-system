@@ -1,23 +1,28 @@
+// contexts/AuthContext.tsx
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 interface User {
     id: string;
+    name: string;
     email: string;
 }
 
 interface AuthContextType {
     user: User | null;
-    login: (email: string, password: string) => Promise<void>;
-    logout: () => void;
     isLoading: boolean;
+    login: (email: string, password: string) => Promise<void>;
+    register: (name: string, email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const API_URL = 'http://localhost:8080/api';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
@@ -25,67 +30,88 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const router = useRouter();
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
         checkAuth();
     }, []);
 
     const checkAuth = async () => {
         try {
             const token = localStorage.getItem('token');
-            if (!token) {
-                setIsLoading(false);
-                router.push('/login');
-                return;
-            }
-
-            // Get user data using the token
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/tasks`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            if (response.status === 200) {
-                // If we can fetch tasks, the token is valid
-                setUser({ id: 'user_id', email: 'user_email' }); // You can store these in the token claims
-            } else {
-                localStorage.removeItem('token');
-                router.push('/login');
+            if (token) {
+                const response = await axios.get(`${API_URL}/me`);
+                setUser(response.data.user);
+                router.push('/dashboard');
             }
         } catch (error) {
-            console.error('Auth check failed:', error);
+            console.error('Auth check error:', error);
             localStorage.removeItem('token');
+            setUser(null);
             router.push('/login');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const login = async (email: string, password: string) => {
+    const register = async (name: string, email: string, password: string) => {
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+            const response = await axios.post(`${API_URL}/register`, {
+                name,
                 email,
                 password
             });
 
-            const { token, user: userData } = response.data;
+            const { token, user } = response.data;
             localStorage.setItem('token', token);
-            setUser(userData);
-            router.push('/dashboard');
-            toast.success('Login successful!');
-        } catch (error) {
-            console.error('Login failed:', error);
-            toast.error('Invalid credentials');
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            setUser(user);
+            toast.success('Registration successful!');
+            await router.push('/dashboard');
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.error || 'Registration failed';
+            toast.error(errorMessage);
             throw error;
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem('token');
-        setUser(null);
-        router.push('/login');
-        toast.success('Logged out successfully');
+    const login = async (email: string, password: string) => {
+        try {
+            const response = await axios.post(`${API_URL}/login`, {
+                email,
+                password
+            });
+
+            const { token, user } = response.data;
+            localStorage.setItem('token', token);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            setUser(user);
+            toast.success('Login successful!');
+            await router.push('/dashboard');
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.error || 'Login failed';
+            toast.error(errorMessage);
+            throw error;
+        }
+    };
+
+    const logout = async () => {
+        try {
+            await axios.post(`${API_URL}/logout`);
+            toast.success('Logged out successfully');
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            localStorage.removeItem('token');
+            delete axios.defaults.headers.common['Authorization'];
+            setUser(null);
+            router.push('/login');
+        }
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+        <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -58,6 +58,7 @@ const StatCard = ({ title, value, icon: Icon, color }: {
 );
 
 export default function Dashboard() {
+    
     const { user, isLoading: isAuthLoading } = useAuth();
     const [tasks, setTasks] = useState<Task[]>([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
