@@ -21,3 +21,5 @@ export interface User {
     suggestions: string;
     generated_at: string;
   }
+
+  

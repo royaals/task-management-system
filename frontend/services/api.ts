@@ -46,10 +46,18 @@ export const taskApi = {
         await api.delete(`/tasks/${id}`);
     },
 
-    getAISuggestions: async (taskId: string) => {
-        const response = await api.get(`/tasks/${taskId}/suggestions`);
-        return response.data;
-    }
+     getAISuggestions: async (prompt: string) => {
+        try {
+            const response = await api.post('/ai/suggestions', {
+                prompt: prompt
+            });
+            return response.data;
+        } catch (error: any) {
+            console.error('AI Service Error:', error.response?.data || error.message);
+            throw error;
+        }
+   
+  }
 };
 
 export const authApi = {

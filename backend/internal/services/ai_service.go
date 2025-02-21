@@ -49,9 +49,7 @@ func NewAIService(apiKey string) (*AIService, error) {
     }, nil
 }
 
-func (s *AIService) GenerateTaskSuggestions(task models.Task) (string, error) {
-    prompt := generateAIPrompt(task)
-    
+func (s *AIService) GenerateResponse(prompt string) (string, error) {
     request := OpenAIRequest{
         Model: "gpt-4o-mini",
         Store: true,
@@ -110,6 +108,11 @@ func (s *AIService) GenerateTaskSuggestions(task models.Task) (string, error) {
     }
 
     return response.Choices[0].Message.Content, nil
+}
+
+func (s *AIService) GenerateTaskSuggestions(task models.Task) (string, error) {
+    prompt := generateAIPrompt(task)
+    return s.GenerateResponse(prompt)
 }
 
 func generateAIPrompt(task models.Task) string {

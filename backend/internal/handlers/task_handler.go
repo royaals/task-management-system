@@ -36,7 +36,7 @@ func CreateTask(c *gin.Context) {
     // Generate AI suggestions if configured
     aiService, err := services.NewAIService(os.Getenv("OPENAI_API_KEY"))
     if err == nil {
-        suggestions, err := aiService.GenerateTaskSuggestions(task)
+        suggestions, err := aiService.GenerateResponse(task.Title + ": " + task.Description)
         if err != nil {
             log.Printf("Error generating AI suggestions: %v", err)
         } else {
@@ -130,49 +130,4 @@ func DeleteTask(c *gin.Context) {
     }
 
     c.JSON(200, gin.H{"message": "Task deleted successfully"})
-}
-
-func GetAISuggestions(c *gin.Context) {
-    taskID, err := primitive.ObjectIDFromHex(c.Param("id"))
-    if err != nil {
-        c.JSON(400, gin.H{"error": "Invalid task ID"})
-        return
-    }
-
-    // Get task details
-    collection := database.Client.Database("taskmanagement").Collection("tasks")
-    var task models.Task
-    err = collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
-    if err != nil {
-        c.JSON(404, gin.H{"error": "Task not found"})
-        return
-    }
-
-    // Generate AI suggestions
-    aiService, err := services.NewAIService(os.Getenv("OPENAI_API_KEY"))
-    if err != nil {
-        c.JSON(500, gin.H{"error": "Failed to initialize AI service"})
-        return
-    }
-
-    suggestions, err := aiService.GenerateTaskSuggestions(task)
-    if err != nil {
-        c.JSON(500, gin.H{"error": "Failed to generate suggestions"})
-        return
-    }
-
-    // Store and return suggestions
-    suggCollection := database.Client.Database("taskmanagement").Collection("ai_suggestions")
-    suggestion := models.AITaskSuggestion{
-        TaskID:      taskID,
-        Suggestion:  suggestions,
-        GeneratedAt: time.Now(),
-    }
-
-    _, err = suggCollection.InsertOne(context.Background(), suggestion)
-    if err != nil {
-        log.Printf("Error storing AI suggestions: %v", err)
-    }
-
-    c.JSON(200, suggestion)
 }

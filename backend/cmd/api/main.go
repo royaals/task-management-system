@@ -39,8 +39,8 @@ func main() {
             protected.PUT("/tasks/:id", handlers.UpdateTask)
             protected.DELETE("/tasks/:id", handlers.DeleteTask)
             
-            // AI suggestions routes
-            protected.GET("/tasks/:id/suggestions", handlers.GetAISuggestions)
+            // AI routes
+            protected.POST("/ai/suggestions", handlers.GetAISuggestions)
         }
     }
 

@@ -30,3 +30,23 @@ type AITaskSuggestion struct {
     Suggestion  string            `bson:"suggestion" json:"suggestion"`
     GeneratedAt time.Time         `bson:"generated_at" json:"generated_at"`
 }
+
+// internal/models/models.go
+type TaskTemplate struct {
+    ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    Name        string            `bson:"name" json:"name"`
+    Description string            `bson:"description" json:"description"`
+    Priority    string            `bson:"priority" json:"priority"`
+    Tags        []string          `bson:"tags" json:"tags"`
+    CreatedBy   primitive.ObjectID `bson:"created_by" json:"created_by"`
+    CreatedAt   time.Time         `bson:"created_at" json:"created_at"`
+}
+
+type RecurringTask struct {
+    ID           primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    TaskTemplate primitive.ObjectID `bson:"task_template" json:"task_template"`
+    Frequency    string            `bson:"frequency" json:"frequency"` // daily, weekly, monthly
+    NextDue      time.Time         `bson:"next_due" json:"next_due"`
+    LastCreated  time.Time         `bson:"last_created" json:"last_created"`
+    Active       bool              `bson:"active" json:"active"`
+}
