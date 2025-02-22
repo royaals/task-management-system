@@ -80,7 +80,7 @@ cp .env.example .env
 go mod tidy
 ```
 
-5. Run MongoDB (if not using Docker):
+5. Run MongoDB:
 
 ```bash
 docker run -d --name mongodb -p 27017:27017 mongo
