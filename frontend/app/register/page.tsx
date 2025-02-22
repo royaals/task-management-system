@@ -33,9 +33,9 @@ export default function RegisterPage() {
     });
     const [errors, setErrors] = useState<Partial<RegisterFormData>>({});
 
-    // Redirect if already authenticated
+    
     useEffect(() => {
-        // Only redirect if user is already authenticated
+        
         if (user && !authLoading) {
             router.push('/dashboard');
         }
@@ -44,21 +44,21 @@ export default function RegisterPage() {
     const validateForm = (): boolean => {
         const newErrors: Partial<RegisterFormData> = {};
 
-        // Name validation
+        
         if (!formData.name.trim()) {
             newErrors.name = 'Name is required';
         } else if (formData.name.length < 2) {
             newErrors.name = 'Name must be at least 2 characters';
         }
 
-        // Email validation
+        
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
         } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
             newErrors.email = 'Invalid email address';
         }
 
-        // Password validation
+        
         if (!formData.password) {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 8) {
@@ -72,7 +72,7 @@ export default function RegisterPage() {
     };
 
 
-   // app/register/page.tsx
+   
 
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +85,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     try {
         await register(formData.name, formData.email, formData.password);
-        // Registration successful - redirection is handled in register function
+        
     } catch (error: any) {
         console.error('Registration error:', error);
         toast.error(error.response?.data?.error || 'Registration failed');
@@ -99,7 +99,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             ...prev,
             [name]: value,
         }));
-        // Clear error when user starts typing
+       
         if (errors[name as keyof RegisterFormData]) {
             setErrors(prev => ({
                 ...prev,
@@ -108,7 +108,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         }
     };
 
-    // Show loading spinner while checking auth status
+   
     if (authLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -125,7 +125,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 transition={{ duration: 0.5 }}
                 className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg"
             >
-                {/* Header Section */}
+                
                 <div className="text-center">
                     <motion.div
                         initial={{ scale: 0 }}
@@ -149,9 +149,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </p>
                 </div>
 
-                {/* Registration Form */}
+                
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    {/* Name Field */}
+                    
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                             Full Name
@@ -185,7 +185,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         )}
                     </div>
 
-                    {/* Email Field */}
+                    
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                             Email address
@@ -219,7 +219,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         )}
                     </div>
 
-                    {/* Password Field */}
+                    
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                             Password
@@ -264,7 +264,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         )}
                     </div>
 
-                    {/* Submit Button */}
+                    
                     <div>
                         <button
                             type="submit"
@@ -285,7 +285,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </div>
                 </form>
 
-                {/* Terms and Privacy */}
+                
                 <div className="mt-6">
                     <p className="text-xs text-gray-600 text-center">
                         By creating an account, you agree to our{' '}
@@ -299,7 +299,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </p>
                 </div>
 
-                {/* Back to Home Link */}
+               
                 <div className="mt-4 text-center">
                     <Link
                         href="/"

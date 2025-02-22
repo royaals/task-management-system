@@ -15,12 +15,12 @@ var upgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
     WriteBufferSize: 1024,
     CheckOrigin: func(r *http.Request) bool {
-        return true // Allow all origins in development
+        return true 
     },
 }
 
 func HandleWebSocket(c *gin.Context) {
-    // Get token from query parameter
+    
     token := c.Query("token")
     if token == "" {
         log.Printf("No token provided")
@@ -28,7 +28,7 @@ func HandleWebSocket(c *gin.Context) {
         return
     }
 
-    // Validate token
+    
     claims := jwt.MapClaims{}
     _, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
         return []byte(os.Getenv("JWT_SECRET")), nil

@@ -1,4 +1,4 @@
-// components/TaskList/types.ts
+
 import { Task } from '@/types';
 
 export interface TaskListProps {

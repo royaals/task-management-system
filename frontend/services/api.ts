@@ -6,7 +6,7 @@ const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 });
 
-// Request interceptor
+
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -15,7 +15,7 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Response interceptor
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {

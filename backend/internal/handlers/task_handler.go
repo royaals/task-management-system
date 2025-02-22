@@ -33,14 +33,14 @@ func CreateTask(c *gin.Context) {
         return
     }
 
-    // Generate AI suggestions if configured
+  
     aiService, err := services.NewAIService(os.Getenv("OPENAI_API_KEY"))
     if err == nil {
         suggestions, err := aiService.GenerateResponse(task.Title + ": " + task.Description)
         if err != nil {
             log.Printf("Error generating AI suggestions: %v", err)
         } else {
-            // Store AI suggestions
+            
             suggCollection := database.Client.Database("taskmanagement").Collection("ai_suggestions")
             suggCollection.InsertOne(context.Background(), models.AITaskSuggestion{
                 TaskID:      task.ID,

@@ -70,7 +70,7 @@ export default function Dashboard() {
     const [selectedFilter, setSelectedFilter] = useState('all');
     const [statistics, setStatistics] = useState<Statistics>(initialStatistics);
 
-    // Fetch tasks when authenticated
+    
     useEffect(() => {
         if (!isAuthLoading && user) {
             fetchTasks();
@@ -79,7 +79,7 @@ export default function Dashboard() {
         }
     }, [isAuthLoading, user]);
 
-    // Calculate statistics when tasks change
+    
     useEffect(() => {
         if (!tasks) return;
         
@@ -194,7 +194,7 @@ export default function Dashboard() {
                         </button>
                     </div>
 
-                    {/* Statistics Grid */}
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <StatCard
                             title="Total Tasks"
@@ -222,7 +222,7 @@ export default function Dashboard() {
                         />
                     </div>
 
-                    {/* Tasks Section */}
+                    
                     <div className="bg-white rounded-xl shadow-sm p-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-semibold text-gray-900">Tasks</h2>
@@ -266,10 +266,10 @@ export default function Dashboard() {
                     </div>
                 </motion.div>
 
-                {/* AI Chat Component */}
+               
                 <AIChat />
 
-                {/* Create Task Modal */}
+               
                 <AnimatePresence>
                     {isCreateModalOpen && (
                       <CreateTaskModal

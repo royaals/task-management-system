@@ -1,4 +1,4 @@
-// components/TaskList/index.tsx
+
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,7 +25,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask }
                         exit={{ opacity: 0, y: -20 }}
                         className="bg-white rounded-lg shadow p-4"
                     >
-                        {/* Task item content */}
+                        
                         <div className="flex justify-between items-center">
                             <div>
                                 <h3 className="text-lg font-medium">{task.title}</h3>

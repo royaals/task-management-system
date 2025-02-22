@@ -39,17 +39,17 @@ export default function TasksPage() {
         
         let filtered = [...tasks];
 
-        // Apply status filter
+        
         if (filters.status !== 'all') {
             filtered = filtered.filter(task => task.status === filters.status);
         }
 
-        // Apply priority filter
+        
         if (filters.priority !== 'all') {
             filtered = filtered.filter(task => task.priority === filters.priority);
         }
 
-        // Apply search
+        
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
             filtered = filtered.filter(task => 
@@ -137,7 +137,7 @@ export default function TasksPage() {
                         </button>
                     </div>
 
-                    {/* Filters and Search */}
+                  
                     <div className="bg-white rounded-lg shadow p-4 mb-6">
                         <div className="flex flex-col md:flex-row gap-4">
                             <div className="flex-1 relative">
@@ -175,7 +175,7 @@ export default function TasksPage() {
                         </div>
                     </div>
 
-                    {/* Tasks List */}
+                 
                     {isLoading ? (
                         <div className="flex justify-center items-center h-64">
                             <LoadingSpinner size="large" />
@@ -204,7 +204,7 @@ export default function TasksPage() {
                     )}
                 </div>
 
-                {/* Create Task Modal */}
+               
                 <CreateTaskModal
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}

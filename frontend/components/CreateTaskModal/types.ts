@@ -1,4 +1,4 @@
-// components/CreateTaskModal/types.ts
+
 import { Task } from '@/types';
 
 export interface CreateTaskModalProps {

@@ -1,4 +1,4 @@
-// cmd/api/main.go
+
 package main
 
 import (
@@ -16,35 +16,35 @@ func main() {
         log.Fatal("Error loading .env file")
     }
 
-    // Initialize database
+    
     database.InitDatabase()
 
-    // Initialize Gin router
+    
     r := gin.Default()
     
-    // Apply CORS middleware
+    
     r.Use(middleware.CORSMiddleware())
 
-    // API routes
+    
     api := r.Group("/api")
     {
-        // Auth routes
+        
         api.POST("/register", handlers.Register)
         api.POST("/login", handlers.Login)
         api.POST("/logout", handlers.Logout)
         api.GET("/me", handlers.GetMe)
 
-        // Task routes
+        
         api.GET("/tasks", handlers.GetTasks)
         api.POST("/tasks", handlers.CreateTask)
         api.PUT("/tasks/:id", handlers.UpdateTask)
         api.DELETE("/tasks/:id", handlers.DeleteTask)
         
-        // AI routes
+       
         api.POST("/ai/suggestions", handlers.GetAISuggestions)
     }
 
-    // Start server
+    
     port := os.Getenv("PORT")
     if port == "" {
         port = "8080"

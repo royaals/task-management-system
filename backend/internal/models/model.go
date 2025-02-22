@@ -31,7 +31,7 @@ type AITaskSuggestion struct {
     GeneratedAt time.Time         `bson:"generated_at" json:"generated_at"`
 }
 
-// internal/models/models.go
+
 type TaskTemplate struct {
     ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
     Name        string            `bson:"name" json:"name"`

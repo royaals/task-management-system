@@ -1,4 +1,4 @@
-// components/Sidebar.tsx
+
 import { HomeIcon, ClipboardIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -7,7 +7,7 @@ export default function Sidebar() {
   return (
     <div className="w-64 bg-white border-r border-gray-200 p-4">
       <div className="flex items-center mb-8">
-        {/* Use Next.js Image component for logo */}
+       
         <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
           T
         </div>

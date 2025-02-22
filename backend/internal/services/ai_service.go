@@ -1,4 +1,4 @@
-// services/ai_service.go
+
 package services
 
 import (
@@ -84,7 +84,7 @@ func (s *AIService) GenerateResponse(prompt string) (string, error) {
     defer resp.Body.Close()
 
     if resp.StatusCode != http.StatusOK {
-        // Read error response
+        
         var errorResponse struct {
             Error struct {
                 Message string `json:"message"`

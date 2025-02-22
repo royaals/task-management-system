@@ -1,7 +1,7 @@
 package handlers
 
 import (
-    "fmt"     // Add this import
+    "fmt"    
     "log"
     "os"
     "time"
@@ -26,7 +26,7 @@ func GetAISuggestions(c *gin.Context) {
         return
     }
 
-    // Check API key
+    
     apiKey := os.Getenv("OPENAI_API_KEY")
     if apiKey == "" {
         log.Printf("OpenAI API key not set")
@@ -36,7 +36,7 @@ func GetAISuggestions(c *gin.Context) {
 
     log.Printf("Initializing AI service with key length: %d", len(apiKey))
 
-    // Initialize AI service
+   
     aiService, err := services.NewAIService(apiKey)
     if err != nil {
         log.Printf("Failed to initialize AI service: %v", err)
@@ -46,7 +46,7 @@ func GetAISuggestions(c *gin.Context) {
 
     log.Printf("Generating response for prompt: %s", request.Prompt)
 
-    // Generate suggestions
+    
     suggestions, err := aiService.GenerateResponse(request.Prompt)
     if err != nil {
         log.Printf("Failed to generate suggestions: %v", err)

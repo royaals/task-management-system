@@ -91,7 +91,7 @@ export default function AIAssistantPage() {
                     </p>
                 </div>
 
-                {/* Messages */}
+              
                 <div className="flex-1 overflow-y-auto p-8 space-y-6">
                     {messages.map((message) => (
                         <motion.div
@@ -129,7 +129,7 @@ export default function AIAssistantPage() {
                     )}
                 </div>
 
-                {/* Input */}
+                
                 <div className="p-4 border-t bg-white">
                     <div className="max-w-4xl mx-auto flex gap-4">
                         <input

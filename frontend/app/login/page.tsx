@@ -31,7 +31,7 @@ export default function LoginPage() {
     });
     const [errors, setErrors] = useState<Partial<LoginFormData>>({});
 
-    // Redirect if already authenticated
+    
     useEffect(() => {
         if (user && !authLoading) {
             router.push('/dashboard');
@@ -41,14 +41,14 @@ export default function LoginPage() {
     const validateForm = (): boolean => {
         const newErrors: Partial<LoginFormData> = {};
 
-        // Email validation
+        
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
         } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
             newErrors.email = 'Invalid email address';
         }
 
-        // Password validation
+        
         if (!formData.password) {
             newErrors.password = 'Password is required';
         }
@@ -64,7 +64,7 @@ export default function LoginPage() {
   
       try {
           await login(formData.email, formData.password);
-          // Login successful - redirection is handled in login function
+          
       } catch (error: any) {
           console.error('Login error:', error);
           toast.error(error.response?.data?.error || 'Login failed');
@@ -78,7 +78,7 @@ export default function LoginPage() {
             ...prev,
             [name]: value,
         }));
-        // Clear error when user starts typing
+        
         if (errors[name as keyof LoginFormData]) {
             setErrors(prev => ({
                 ...prev,
@@ -103,7 +103,7 @@ export default function LoginPage() {
                 transition={{ duration: 0.5 }}
                 className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg"
             >
-                {/* Header Section */}
+               
                 <div className="text-center">
                     <motion.div
                         initial={{ scale: 0 }}
@@ -127,9 +127,9 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                {/* Login Form */}
+                
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    {/* Email Field */}
+                    
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                             Email address
@@ -163,7 +163,7 @@ export default function LoginPage() {
                         )}
                     </div>
 
-                    {/* Password Field */}
+                   
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                             Password
@@ -231,7 +231,7 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-                    {/* Submit Button */}
+                    
                     <div>
                         <button
                             type="submit"
@@ -252,7 +252,7 @@ export default function LoginPage() {
                     </div>
                 </form>
 
-                {/* Back to Home Link */}
+               
                 <div className="mt-4 text-center">
                     <Link
                         href="/"

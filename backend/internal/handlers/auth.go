@@ -1,4 +1,4 @@
-// internal/handlers/auth.go
+
 package handlers
 
 import (
@@ -31,7 +31,7 @@ func Register(c *gin.Context) {
         return
     }
 
-    // Check if user exists
+   
     collection := database.GetCollection("users")
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
@@ -43,14 +43,14 @@ func Register(c *gin.Context) {
         return
     }
 
-    // Hash password
+    
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
     if err != nil {
         c.JSON(500, gin.H{"error": "Failed to hash password"})
         return
     }
 
-    // Create user
+    
     user := User{
         ID:       primitive.NewObjectID(),
         Name:     input.Name,
@@ -64,7 +64,7 @@ func Register(c *gin.Context) {
         return
     }
 
-    // Generate token
+   
     token, err := middleware.GenerateToken(user.ID.Hex())
     if err != nil {
         c.JSON(500, gin.H{"error": "Failed to generate token"})

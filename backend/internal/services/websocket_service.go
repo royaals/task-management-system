@@ -1,4 +1,4 @@
-// internal/services/websocket_service.go
+
 package services
 
 import (
@@ -97,18 +97,18 @@ func (c *Client) ReadPump() {
             break
         }
         
-        // Handle incoming messages
+       
         var msg map[string]interface{}
         if err := json.Unmarshal(message, &msg); err != nil {
             log.Printf("Error parsing message: %v", err)
             continue
         }
 
-        // Process message based on type
+        
         if msgType, ok := msg["type"].(string); ok {
             switch msgType {
             case "ping":
-                // Handle ping
+                
                 c.Send <- []byte(`{"type": "pong"}`)
             default:
                 log.Printf("Received message of type %s from client %s", msgType, c.ID)
