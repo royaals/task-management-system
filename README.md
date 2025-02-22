@@ -11,10 +11,7 @@ TaskAI is a modern, AI-powered task management system that combines intelligent 
 - 🔐 Secure JWT-based authentication
 - ✅ Intuitive task creation and management
 - 🤖 AI-powered task suggestions and breakdowns
-- 🔄 Real-time updates via WebSocket
-- 👥 Team collaboration and task assignment
-- 📊 Analytics and progress tracking
-
+- 👥 task assignment
 
 
 ## 🛠️ Tech Stack
@@ -42,27 +39,114 @@ TaskAI is a modern, AI-powered task management system that combines intelligent 
 - Go 1.21+
 - Node.js 18+
 - MongoDB
-- Docker (optional)
+- Docker 
 - OpenAI API Key
 
-### Local Development Setup
+## Local Development Setup
 
-1. **Clone the repository**
+Follow the steps below to set up and run the Task System locally.
+
+### Clone the Repository
+
 ```bash
-git clone https://github.com/royaals/task-system.git
-cd task-system
+git clone git clone https://github.com/royaals/task-system.git
+cd task-management-system
 ```
-2. backend
+
+---
+
+## Backend Setup
+
+1. Navigate to the backend directory:
+
 ```bash
 cd backend
-replace the .env.example to .env
+```
+
+2. Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+3. Update `.env` with your configurations:
+   - **MongoDB URI**
+   - **JWT secret**
+   - **OpenAI API key**
+
+4. Install Go dependencies:
+
+```bash
 go mod tidy
+```
+
+5. Run MongoDB (if not using Docker):
+
+```bash
 docker run -d --name mongodb -p 27017:27017 mongo
+```
+
+6. Start the backend server:
+
+```bash
 go run cmd/api/main.go
 ```
-3. frontend
+
+---
+
+## Frontend Setup
+
+1. Navigate to the frontend directory:
+
 ```bash
 cd frontend
+```
+
+2. Install dependencies:
+
+```bash
 npm install
+```
+
+3. Create and update environment variables:
+
+```bash
+cp .env.example .env.local
+```
+
+4. Start the development server:
+
+```bash
 npm run dev
 ```
+
+---
+
+## Docker Setup
+
+### Using Docker Compose
+
+1. Build and start all services:
+
+```bash
+docker-compose up --build
+```
+
+2. Stop all services:
+
+```bash
+docker-compose down
+```
+
+---
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/your-feature`).
+3. Commit your changes (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature/your-feature`).
+5. Open a Pull Request.
+
