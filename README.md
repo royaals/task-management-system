@@ -24,20 +24,17 @@ TaskAI is a modern, AI-powered task management system that combines intelligent 
 - **Framework:** Gin
 - **Database:** MongoDB
 - **Authentication:** JWT
-- **Real-time:** WebSocket
 - **AI Integration:** OpenAI API
 
 ### Frontend
 - **Framework:** Next.js 14 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
-- **Real-time:** WebSocket
 - **UI Components:** Shadcn UI
 
 ### DevOps
 - **Containerization:** Docker
 - **Orchestration:** Kubernetes
-- **CI/CD:** GitHub Actions
 - **Deployment:** 
   - Frontend: Vercel
   - Backend: Render
@@ -63,6 +60,7 @@ cd task-system
 cd backend
 replace the .env.example to .env
 go mod tidy
+docker run -d --name mongodb -p 27017:27017 mongo
 go run cmd/api/main.go
 ```
 3. frontend
