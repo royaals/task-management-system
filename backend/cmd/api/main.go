@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "log"
+    "net/http"
     "os"
     "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
@@ -12,7 +13,7 @@ import (
 )
 
 func main() {
-    // Load .env only in development
+    // Load .env in development
     if os.Getenv("GO_ENV") != "production" {
         if err := godotenv.Load(); err != nil {
             log.Println("Warning: .env file not found")
@@ -28,15 +29,7 @@ func main() {
     // Add middleware
     r.Use(middleware.CORSMiddleware())
 
-    // Add health check endpoint
-    r.GET("/", func(c *gin.Context) {
-        c.JSON(200, gin.H{
-            "status": "healthy",
-            "message": "Server is running",
-        })
-    })
-
-    // API routes
+    // Routes
     api := r.Group("/api")
     {
         api.POST("/register", handlers.Register)
@@ -50,16 +43,31 @@ func main() {
         api.POST("/ai/suggestions", handlers.GetAISuggestions)
     }
 
-    // Get port from environment
+    // Health check endpoint
+    r.GET("/", func(c *gin.Context) {
+        c.JSON(200, gin.H{
+            "status": "healthy",
+            "message": "Server is running",
+        })
+    })
+
+    // Get port from environment variable
     port := os.Getenv("PORT")
     if port == "" {
-        port = "8080"
+        port = "10000" // Render's default port
     }
 
-    // Start server with explicit host binding
-    address := fmt.Sprintf("0.0.0.0:%s", port)
-    log.Printf("Server starting on %s", address)
-    if err := r.Run(address); err != nil {
+    // Create server with explicit host and port binding
+    server := &http.Server{
+        Addr:    fmt.Sprintf("0.0.0.0:%s", port),
+        Handler: r,
+    }
+
+    // Log server start
+    log.Printf("Server starting on http://0.0.0.0:%s", port)
+
+    // Start server
+    if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
         log.Fatal("Error starting server:", err)
     }
 }
