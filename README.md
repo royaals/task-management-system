@@ -27,7 +27,7 @@ TaskAI is a modern, AI-powered task management system that combines intelligent 
 - **AI Integration:** OpenAI API
 
 ### Frontend
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js 14 
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **UI Components:** Shadcn UI
@@ -35,9 +35,6 @@ TaskAI is a modern, AI-powered task management system that combines intelligent 
 ### DevOps
 - **Containerization:** Docker
 - **Orchestration:** Kubernetes
-- **Deployment:** 
-  - Frontend: Vercel
-  - Backend: Render
 
 ## 📦 Installation
 
