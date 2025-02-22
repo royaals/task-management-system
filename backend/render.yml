@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: tms-backend
+    env: go
+    buildCommand: go build -o main cmd/api/main.go
+    startCommand: go run cmd/api/main.go
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: MONGODB_URI
+        sync: false
